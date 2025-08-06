@@ -3,6 +3,7 @@ package com.example.articlehub.presentation.navigation
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,7 +38,9 @@ fun NavGraph(
                 event = viewModel.events,
                 onBlogCardClick = { id ->
                     navController.navigate(Route.BlogContentScreen(id))
-                }
+                },
+                filteredBlogs = viewModel.filteredBlogs.collectAsState().value,
+                onSearchQueryChange = viewModel::onSearchQueryChange
             )
         }
         composable<Route.BlogContentScreen> {

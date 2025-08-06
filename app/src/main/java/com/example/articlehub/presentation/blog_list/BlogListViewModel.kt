@@ -2,11 +2,14 @@ package com.example.articlehub.presentation.blog_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.articlehub.domain.model.Blog
 import com.example.articlehub.domain.repository.BlogRepository
 import com.example.articlehub.domain.util.Result
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -30,6 +33,20 @@ class BlogListViewModel(
 
     private val _events = Channel<BlogListEvent>()
     val events = _events.receiveAsFlow()
+
+    fun onSearchQueryChange(query: String) {
+        _state.update { it.copy(searchQuery = query) }
+    }
+
+    val filteredBlogs: StateFlow<List<Blog>> = _state.map { state ->
+        if (state.searchQuery.isBlank()) {
+            state.blogs
+        } else {
+            state.blogs.filter {
+                it.title.contains(state.searchQuery, ignoreCase = true)
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
 
     private fun getAllBlogs() {
