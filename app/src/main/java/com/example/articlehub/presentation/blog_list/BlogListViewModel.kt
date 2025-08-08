@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -47,6 +48,20 @@ class BlogListViewModel(
             }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+
+
+    private val _savedBlogs = MutableStateFlow<List<Blog>>(emptyList())
+    val savedBlogs: StateFlow<List<Blog>> = _savedBlogs.asStateFlow()
+
+    fun toggleSaveBlog(blog: Blog) {
+        val updatedList = _state.value.blogs.map {
+            if (it.id == blog.id) it.copy(isSaved = !it.isSaved) else it
+        }
+
+        _state.update { it.copy(blogs = updatedList) }
+
+        _savedBlogs.value = updatedList.filter { it.isSaved }
+    }
 
 
     private fun getAllBlogs() {

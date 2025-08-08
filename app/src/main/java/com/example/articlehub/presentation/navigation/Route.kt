@@ -8,4 +8,7 @@ sealed interface Route {
     data object BlogListScreen: Route
     @Serializable
     data class BlogContentScreen(val blogId: Int): Route
+
+    @Serializable
+    data object SavedBlogsScreen: Route
 }

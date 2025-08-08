@@ -16,8 +16,7 @@ class BlogRepositoryImpl(
 ): BlogRepository {
 
     override suspend fun getAllBlogs(): Result<List<Blog>> {
-        val remoteBlogsResult = remoteBlogDataSource.getAllBlogs()
-        return when (remoteBlogsResult) {
+        return when (val remoteBlogsResult = remoteBlogDataSource.getAllBlogs()) {
             is Result.Success -> {
                 remoteBlogsResult.data?.let { blogs ->
                     localBlogDataSource.deleteAllBlogs()

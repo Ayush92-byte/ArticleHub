@@ -88,4 +88,10 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
+
+    // DataStore
+    implementation (libs.datastore.preferences)
+    implementation (libs.androidx.datastore.preferences.core)
+
+    implementation(libs.kotlinx.coroutines.android)
 }

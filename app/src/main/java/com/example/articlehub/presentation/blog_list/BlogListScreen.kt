@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,16 +38,19 @@ import com.example.articlehub.domain.model.Blog
 import com.example.articlehub.presentation.blog_list.component.BlogCard
 import com.example.articlehub.presentation.common_component.ShimmerEffect
 import kotlinx.coroutines.flow.Flow
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlogListScreen(
     modifier: Modifier = Modifier,
     state: BlogListState,
+    viewModel: BlogListViewModel,
     event: Flow<BlogListEvent>,
     filteredBlogs: List<Blog>,
     onSearchQueryChange: (String) -> Unit,
-    onBlogCardClick: (Int) -> Unit
+    onBlogCardClick: (Int) -> Unit,
+    onSavedClick: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -70,7 +74,8 @@ fun BlogListScreen(
         BlogListTopBar(
             searchQuery = state.searchQuery,
             onSearchQueryChange = onSearchQueryChange,
-            scrollBehavior = scrollBehaviour
+            scrollBehavior = scrollBehaviour,
+            onSavedClick = onSavedClick
         )
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 300.dp),
@@ -92,7 +97,8 @@ fun BlogListScreen(
                 items(filteredBlogs) { blog ->
                     BlogCard(
                         modifier = Modifier.clickable { onBlogCardClick(blog.id) },
-                        blog = blog
+                        blog = blog,
+                        onSaveClick = { viewModel.toggleSaveBlog(it) }
                     )
                 }
             }
@@ -106,6 +112,7 @@ private fun BlogListTopBar(
     searchQuery: String,
     scrollBehavior: TopAppBarScrollBehavior,
     onSearchQueryChange: (String) -> Unit,
+    onSavedClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -113,7 +120,15 @@ private fun BlogListTopBar(
             scrollBehavior = scrollBehavior,
             windowInsets = WindowInsets(0),
             modifier = modifier,
-            title = { Text(text = "Android Blogs") }
+            title = { Text(text = "Android Blogs") },
+            actions = {
+                IconButton(onClick = onSavedClick) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Go to Saved Blogs"
+                    )
+                }
+            }
         )
         OutlinedTextField(
             value = searchQuery,

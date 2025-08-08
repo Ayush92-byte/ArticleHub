@@ -5,5 +5,6 @@ data class Blog(
     val title: String,
     val thumbnailUrl: String,
     val contentUrl: String,
-    val content: String?
+    val content: String?,
+    val isSaved: Boolean = false
 )
